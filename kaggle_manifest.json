@@ -1,21 +1,35 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "dataset": "Turkish Daily Dialogues 5K",
   "license": "CC BY 4.0",
-  "attribution": "3nesdeniz, Turkish Daily Dialogues 5K; source https://huggingface.co/datasets/3nesdeniz/turkish-daily-dialogues-5k. This derivative converts the capped train-only conversations to the clean-model schema.",
-  "source_revision": "ed5f958a1e0d115c74f74e5cdde692ec80e594c0",
-  "source_train_sha256": "b5cbf4d11d7ea547995a279b3b7d11714bb37d2531576972a3dfb53e68433b72",
-  "training_data_sha256": "6654ab5975773c86104ae3da0623f3da83ed285f10f01fccc5aa914b94b3337e",
-  "record_count": 2480,
+  "attribution": "3nesdeniz, Turkish Daily Dialogues 5K; Common Voice Scripted Speech 27.0 Turkish under CC0-1.0.",
   "review_status": "draft",
+  "source_split": "upstream train only",
+  "common_voice": {
+    "dataset": "Common Voice Scripted Speech 27.0 Turkish",
+    "license": "CC0-1.0",
+    "source_split": "train and validation only",
+    "archive_path": "data/common_voice_27_active_trainval_001.zip",
+    "archive_sha256": "67086914c62aa0ca423208ab1db8291d2050525c68bd7151832d4c1527b10280",
+    "test_included": false,
+    "extracted_sha256": {
+      "train.tsv": "e5aa98dcb4d4be187107044fa40cff7f40507693a9cbfb9b73678d231346f7ac",
+      "validation.tsv": "ad2cbe1cf24e42b74899204dc41d1c0446c3035fc35ff77a57d3bdc116af6002",
+      "manifest.json": "738e8f5cd5215674a78fa22079d67056c775f5cbd4719abd0c5afe4a915ebba4"
+    }
+  },
   "files": {
-    "README.md": "8f0fb5ab182289bc29bbf31ec1bac27558bce6b37168d1df1cd24b67f1d7b6ae",
-    "clean_model/data.py": "fe68dd932cca1234098ea14509038e57139eedb4e653d5dc26471cb2d95d0878",
-    "clean_model/engine.py": "5c1f4cf773d3cb972f81b167a7253c78010ad1912c431ba4905de5a01b352e48",
-    "clean_model/train.py": "448655580a05414c4bba5983b4c0f145c6fc33eb045cc7126fc54b023b0fdfa0",
+    "README.md": "7611c7190f1edd40948d24543651d13fd005362311577a4b73c4e5e3335ab6be",
+    "requirements.txt": "d880160a49d8f459076a01ba55135e572b61f10709c15ef2ac568a14e2355553",
+    "kaggle_turkish_two_stage.ipynb": "3a5a0680b2f0ec2035e5a0dc8df5d2dcf5c14548be05e37b56db4ed73d664cf4",
     "clean_model/__init__.py": "31377d6ac43db47889e4a0f6ea4a82a5548a5cca0abe5600a3494e43c63f5f0d",
+    "clean_model/data.py": "fe68dd932cca1234098ea14509038e57139eedb4e653d5dc26471cb2d95d0878",
+    "clean_model/engine.py": "e4ef23a556b44a429147a79a995c97017a920f69d2219e3a5b5332632e9e0f1c",
+    "clean_model/train.py": "448655580a05414c4bba5983b4c0f145c6fc33eb045cc7126fc54b023b0fdfa0",
+    "clean_model/two_stage.py": "29ef26760b3d31bd2581b40aa0f3e2cc1e628d8e48b57fce53aa89b3d3d854d3",
     "data/raw/turkish_daily_dialogues_sft_001/LICENSE": "dcbe9d3097e6133b741c26c33f23cd6ad8a38cedf57988b33e7b3898e7bf7727",
     "data/raw/turkish_daily_dialogues_sft_001/manifest.json": "2a34d5303969b04f2876d889c5b7d7031b9c4324ad86d4dfb618f20525cc9e5f",
-    "data/raw/turkish_daily_dialogues_sft_001/train.jsonl": "6654ab5975773c86104ae3da0623f3da83ed285f10f01fccc5aa914b94b3337e"
+    "data/raw/turkish_daily_dialogues_sft_001/train.jsonl": "6654ab5975773c86104ae3da0623f3da83ed285f10f01fccc5aa914b94b3337e",
+    "data/common_voice_27_active_trainval_001.zip": "67086914c62aa0ca423208ab1db8291d2050525c68bd7151832d4c1527b10280"
   }
 }

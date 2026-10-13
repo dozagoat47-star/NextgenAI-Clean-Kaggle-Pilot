@@ -13,8 +13,9 @@ def _prompt_text(
 ) -> str:
     pieces = []
     for message in messages:
-        if message.get('role') not in ('user', 'assistant'):
-            raise ValueError('messages may only contain user/assistant roles')
+        if message.get('role') not in ('system', 'user', 'assistant'):
+            raise ValueError(
+                'messages may only contain system/user/assistant roles')
         content = message.get('content')
         if not isinstance(content, str) or not content.strip():
             raise ValueError('message content must be a non-empty string')
@@ -43,18 +44,40 @@ class PilotGenerator:
             map_location='cpu',
             weights_only=True,
         )
-        if checkpoint.get('schema_version') != 1:
+        schema_version = checkpoint.get('schema_version')
+        if schema_version not in (1, 2):
             raise ValueError('unsupported pilot checkpoint schema')
-        vocabulary = checkpoint.get('vocabulary')
-        if not isinstance(vocabulary, list) or not all(
-                isinstance(character, str) and len(character) == 1
-                for character in vocabulary):
-            raise ValueError('checkpoint has an invalid character vocabulary')
-        self.vocabulary = vocabulary
-        self.char_to_id = {
-            character: index + SPECIAL_TOKEN_COUNT
-            for index, character in enumerate(vocabulary)
-        }
+        self.tokenizer = None
+        if schema_version == 1:
+            vocabulary = checkpoint.get('vocabulary')
+            if not isinstance(vocabulary, list) or not all(
+                    isinstance(character, str) and len(character) == 1
+                    for character in vocabulary):
+                raise ValueError(
+                    'checkpoint has an invalid character vocabulary')
+            self.vocabulary = vocabulary
+            self.char_to_id = {
+                character: index + SPECIAL_TOKEN_COUNT
+                for index, character in enumerate(vocabulary)
+            }
+        else:
+            if checkpoint.get('tokenizer_type') != 'byte_level_bpe':
+                raise ValueError('unsupported pilot tokenizer type')
+            tokenizer_json = checkpoint.get('tokenizer_json')
+            if not isinstance(tokenizer_json, str):
+                raise ValueError('checkpoint has no serialized BPE tokenizer')
+            try:
+                from tokenizers import Tokenizer
+                self.tokenizer = Tokenizer.from_str(tokenizer_json)
+            except (ImportError, ValueError) as exc:
+                raise RuntimeError(
+                    'BPE checkpoints require the tokenizers package') from exc
+            if (self.tokenizer.get_vocab_size()
+                    != checkpoint['model_config'].get('vocab_size')):
+                raise ValueError(
+                    'BPE tokenizer size does not match model configuration')
+            self.vocabulary = []
+            self.char_to_id = {}
         self.device = torch.device(
             device or ('cuda' if torch.cuda.is_available() else 'cpu'))
         self.model: PilotCausalLM = PilotCausalLM(
@@ -69,6 +92,15 @@ class PilotGenerator:
         evidence: list[dict[str, str]] | None = None,
         max_new_tokens: int = 240,
     ) -> str:
+        if self.tokenizer is not None:
+            return _generate_bpe_response(
+                self.model,
+                self.tokenizer,
+                messages,
+                evidence=evidence or [],
+                device=self.device,
+                max_new_tokens=max_new_tokens,
+            )
         return generate_response(
             self.model,
             self.vocabulary,
@@ -80,6 +112,43 @@ class PilotGenerator:
 
     def __call__(self, message: str) -> str:
         return self.generate([{'role': 'user', 'content': message}])
+
+
+def _generate_bpe_response(
+    model: PilotCausalLM,
+    tokenizer,
+    messages: list[dict[str, str]],
+    evidence: list[dict[str, str]],
+    device: torch.device,
+    max_new_tokens: int,
+) -> str:
+    if max_new_tokens < 1:
+        raise ValueError('max_new_tokens must be positive')
+    prompt = _prompt_text(messages, evidence)
+    bos_id = tokenizer.token_to_id('<bos>')
+    eos_id = tokenizer.token_to_id('<eos>')
+    if bos_id is None or eos_id is None:
+        raise ValueError('BPE tokenizer is missing BOS/EOS tokens')
+    prompt_ids = tokenizer.encode(prompt).ids
+    prefix_ids = [bos_id] + prompt_ids[-(model.max_seq_len - 1):]
+    generated = []
+    with torch.no_grad():
+        for _ in range(max_new_tokens):
+            input_ids = torch.tensor(
+                [prefix_ids + generated],
+                dtype=torch.long,
+                device=device,
+            )
+            input_ids = input_ids[:, -model.max_seq_len:]
+            next_id = int(model(input_ids)[0, -1].argmax(dim=-1).item())
+            if next_id == eos_id:
+                break
+            if next_id not in (
+                    tokenizer.token_to_id('<pad>'),
+                    tokenizer.token_to_id('<unk>'),
+                    bos_id):
+                generated.append(next_id)
+    return tokenizer.decode(generated, skip_special_tokens=True).strip()
 
 
 def generation_prefix_ids(
