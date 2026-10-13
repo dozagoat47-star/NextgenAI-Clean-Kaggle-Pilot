@@ -1,0 +1,22 @@
+{
+    "schema_version":  1,
+    "dataset":  "Turkish Daily Dialogues 5K",
+    "license":  "CC BY 4.0",
+    "attribution":  "3nesdeniz, Turkish Daily Dialogues 5K; source https://huggingface.co/datasets/3nesdeniz/turkish-daily-dialogues-5k. This derivative converts the capped train-only conversations to the clean-model schema.",
+    "source_revision":  "ed5f958a1e0d115c74f74e5cdde692ec80e594c0",
+    "source_train_sha256":  "b5cbf4d11d7ea547995a279b3b7d11714bb37d2531576972a3dfb53e68433b72",
+    "training_data_sha256":  "6654ab5975773c86104ae3da0623f3da83ed285f10f01fccc5aa914b94b3337e",
+    "record_count":  2480,
+    "review_status":  "draft",
+    "files":  {
+                  "kaggle_turkish_dialogue_pilot.ipynb":  "b9897dde38499fcf7134da179dd74ac4948480762003c8b870ce6af6eefddb5b",
+                  "README.md":  "e73f350a2591cacc08085f21d98583cc76a2cfd2bc55b196115cf6a0394aa912",
+                  "clean_model/data.py":  "93a397114afc3f3bd3e22d27d382ea085ecb1995eee3be498d198b39b966c14d",
+                  "clean_model/engine.py":  "35fb0bb2dd25caf863df66d1e21b19c7936444324356c413cf345a8f911b3d48",
+                  "clean_model/train.py":  "ba9078773d72f5318e68808d517d513f88f7d36b61fe164bdb0ecbc9b5982033",
+                  "clean_model/__init__.py":  "fda7094f562d5e856d8c52480a22a9eba7a8b965d6b6bfd7e1984f08d3176fe3",
+                  "data/raw/turkish_daily_dialogues_sft_001/LICENSE":  "dcbe9d3097e6133b741c26c33f23cd6ad8a38cedf57988b33e7b3898e7bf7727",
+                  "data/raw/turkish_daily_dialogues_sft_001/manifest.json":  "cab437dc32bb6b12b80ea6e419063e1500f3dee707fa2a5821eea3bbd23c259f",
+                  "data/raw/turkish_daily_dialogues_sft_001/train.jsonl":  "6654ab5975773c86104ae3da0623f3da83ed285f10f01fccc5aa914b94b3337e"
+              }
+}
